@@ -12,7 +12,8 @@ this_dir = os.path.dirname(os.path.realpath(__file__))
 torch_dir = os.path.dirname(torch.__file__)
 conda_include_dir = '/'.join(torch_dir.split('/')[:-4]) + '/include'
 
-extra = {'cxx': ['-std=c++11', '-fopenmp'], 'nvcc': ['-std=c++11', '-Xcompiler', '-fopenmp']}
+extra = {'cxx': ['-std=c++11', '-march=knl', '-O3', '-fopenmp'], 'nvcc': ['-std=c++11', '-Xcompiler', '-fopenmp']}
+INCLUDE_DIRS=os.environ['INSTALL_PREFIX']/include
 
 setup(
     name='sparseconvnet',
@@ -31,7 +32,7 @@ setup(
       if torch.cuda.is_available()  else
       CppExtension('sparseconvnet.SCN',
         ['sparseconvnet/SCN/pybind.cpp', 'sparseconvnet/SCN/sparseconvnet_cpu.cpp'],
-        include_dirs=[conda_include_dir, this_dir+'/sparseconvnet/SCN/'],
+        include_dirs=[conda_include_dir, INSTALL_PREFIX, this_dir+'/sparseconvnet/SCN/'],
         extra_compile_args=extra['cxx'])],
     cmdclass={'build_ext': BuildExtension},
     zip_safe=False,

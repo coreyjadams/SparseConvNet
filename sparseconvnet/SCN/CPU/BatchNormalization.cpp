@@ -50,9 +50,11 @@ void BatchNormalization_ForwardPass(T *input_features, T *output_features,
     w[plane] = saveInvStd[plane] * (weight ? weight[plane] : 1);
     b[plane] = -saveMean[plane] * w[plane] + (bias ? bias[plane] : 0);
   }
+  #pragma omp parallel for
   for (Int row = 0; row < nActive; row++) {
     Int ci = row * input_stride;
     Int co = row * output_stride;
+    #pragma omp parallel for
     for (Int plane = 0; plane < nPlanes; plane++, ci++, co++) {
       T out = input_features[ci] * w[plane] + b[plane];
       const T r = (out > 0) ? 1 : leakiness;

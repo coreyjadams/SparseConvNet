@@ -7,13 +7,13 @@
 # Set up the required software:
 module load datascience/pytorch-1.0
 module swap PrgEnv-intel/6.0.4 PrgEnv-gnu/6.0.4
-export PYTHONPATH=/projects/datascience/cadams/software/datascience_torch_build2/install/lib/python3.5/site-packages/:$PYTHONPATH
+export INSTALL_PREFIX=/projects/datascience/cadams/software/datascience_torch_build3/install/
+export PYTHONPATH=${INSTALL_PREFIX}/lib/python3.5/site-packages/:$PYTHONPATH
 
 module list
 
 # Set the top level SCN directory:
-export TOPDIR=/projects/datascience/cadams/software/datascience_torch_build2/SparseConvNet
-export INSTALL_PREFIX=/projects/datascience/cadams/software/datascience_torch_build2/install/
+export TOPDIR=SparseConvNet
 
 cd ${TOPDIR}
 
