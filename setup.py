@@ -32,7 +32,7 @@ setup(
       if torch.cuda.is_available()  else
       CppExtension('sparseconvnet.SCN',
         ['sparseconvnet/SCN/pybind.cpp', 'sparseconvnet/SCN/sparseconvnet_cpu.cpp'],
-        include_dirs=[conda_include_dir, INSTALL_PREFIX, this_dir+'/sparseconvnet/SCN/'],
+        include_dirs=[conda_include_dir, INCLUDE_DIRS, this_dir+'/sparseconvnet/SCN/'],
         extra_compile_args=extra['cxx'])],
     cmdclass={'build_ext': BuildExtension},
     zip_safe=False,
