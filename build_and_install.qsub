@@ -1,0 +1,26 @@
+#!/bin/bash
+#COBALT -n 1
+#COBALT -t 60
+#COBALT -A datascience
+#COBALT -q debug-flat-quad
+
+# Set up the required software:
+module load datascience/pytorch-1.0
+module swap PrgEnv-intel/6.0.4 PrgEnv-gnu/6.0.4
+export PYTHONPATH=/projects/datascience/cadams/software/datascience_torch_build2/install/lib/python3.5/site-packages/:$PYTHONPATH
+
+module list
+
+# Set the top level SCN directory:
+export TOPDIR=/projects/datascience/cadams/software/datascience_torch_build2/SparseConvNet
+export INSTALL_PREFIX=/projects/datascience/cadams/software/datascience_torch_build2/install/
+
+cd ${TOPDIR}
+
+
+#Remove the build directory if it already exists:
+rm -rf ./build/
+
+# Build and install:
+aprun -N 1 -n 1 -j 1 -d 1 -e CXX=CC -e CC=cc python setup.py build
+aprun -N 1 -n 1 -j 1 -d 1 -e CXX=CC -e CC=cc python setup.py install --prefix=${INSTALL_PREFIX}
