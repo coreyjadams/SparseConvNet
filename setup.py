@@ -13,7 +13,7 @@ torch_dir = os.path.dirname(torch.__file__)
 conda_include_dir = '/'.join(torch_dir.split('/')[:-4]) + '/include'
 
 extra = {'cxx': ['-std=c++11', '-march=knl', '-O3', '-fopenmp'], 'nvcc': ['-std=c++11', '-Xcompiler', '-fopenmp']}
-INCLUDE_DIRS=os.environ['INSTALL_PREFIX']/include
+INCLUDE_DIRS=os.environ['INSTALL_PREFIX'] + "/include"
 
 setup(
     name='sparseconvnet',
