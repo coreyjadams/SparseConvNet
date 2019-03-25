@@ -1,3 +1,5 @@
+This is a fork of the main repository for the purpose of CPU operator optimizations and profiling.  Feel free to contact me if you want more information, but I anticipate generating a pull request ultimately for the modifications made here.
+
 # Submanifold Sparse Convolutional Networks
 
 This is the PyTorch library for training Submanifold Sparse Convolutional Networks.
