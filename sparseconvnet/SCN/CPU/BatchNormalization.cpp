@@ -19,9 +19,10 @@ void BatchNormalization_ForwardPass(T *input_features, T *output_features,
   if (train) {
     std::memset(saveMean, 0, nPlanes * sizeof(T));
     std::memset(saveInvStd, 0, nPlanes * sizeof(T));
+    #pragma omp parallel for collapse(2)
     for (Int row = 0; row < nActive; row++) {
-      Int ci = row * input_stride;
-      for (Int plane = 0; plane < nPlanes; plane++, ci++) {
+      for (Int plane = 0; plane < nPlanes; plane++) {
+        Int ci = row * input_stride + plane;
         T ifci = input_features[ci];
         saveMean[plane] += ifci;
         saveInvStd[plane] += ifci * ifci; // accumulate sum-squares
@@ -50,12 +51,11 @@ void BatchNormalization_ForwardPass(T *input_features, T *output_features,
     w[plane] = saveInvStd[plane] * (weight ? weight[plane] : 1);
     b[plane] = -saveMean[plane] * w[plane] + (bias ? bias[plane] : 0);
   }
-  #pragma omp parallel for
+  #pragma omp parallel for collapse(2)
   for (Int row = 0; row < nActive; row++) {
-    Int ci = row * input_stride;
-    Int co = row * output_stride;
-    #pragma omp parallel for
-    for (Int plane = 0; plane < nPlanes; plane++, ci++, co++) {
+    for (Int plane = 0; plane < nPlanes; plane++) {
+      Int ci = row * input_stride + plane;
+      Int co = row * output_stride + plane;
       T out = input_features[ci] * w[plane] + b[plane];
       const T r = (out > 0) ? 1 : leakiness;
       output_features[co] = out * r;
@@ -74,10 +74,11 @@ void BatchNormalization_BackwardPass(T *input_features, T *d_input_features,
   std::vector<T> gradMean(nPlanes);
   std::vector<T> dotp(nPlanes);
   std::vector<T> k(nPlanes);
+  #pragma omp parallel for collapse(2)
   for (Int row = 0; row < nActive; row++) {
-    Int ci = row * input_stride;
-    Int co = row * output_stride;
-    for (Int plane = 0; plane < nPlanes; plane++, ci++, co++) {
+    for (Int plane = 0; plane < nPlanes; plane++) {
+      Int ci = row * input_stride + plane;
+      Int co = row * output_stride + plane;
       T d = d_output_features[co];
       const T r = (output_features[co] > 0) ? 1 : leakiness;
       d *= r;
@@ -92,10 +93,11 @@ void BatchNormalization_BackwardPass(T *input_features, T *d_input_features,
     gradMean[plane] /= nActive;        // ...now
     k[plane] = dotp[plane] * saveInvStd[plane] * saveInvStd[plane] / nActive;
   }
+  #pragma omp parallel for collapse(2)
   for (Int row = 0; row < nActive; row++) {
-    Int ci = row * input_stride;
-    Int co = row * output_stride;
-    for (Int plane = 0; plane < nPlanes; plane++, ci++, co++) {
+    for (Int plane = 0; plane < nPlanes; plane++) {
+      Int ci = row * input_stride + plane;
+      Int co = row * output_stride + plane;
       d_input_features[ci] =
           (d_output_features[co] - gradMean[plane] -
            (input_features[ci] - saveMean[plane]) * k[plane]) *
